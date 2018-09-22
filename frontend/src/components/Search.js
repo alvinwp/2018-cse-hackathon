@@ -12,6 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { emphasize } from '@material-ui/core/styles/colorManipulator';
 
+
 const suggestions = [
   { label: "Ainsworth : J17" },
   { label: "CSE : K17" }
@@ -225,7 +226,8 @@ class Search extends React.Component {
               onChange={this.handleChange()}
               placeholder="Select rooms"
               isMulti
-              />
+              isDisabled={!Boolean(this.state.buildings)}
+              /> 
           </NoSsr>
         </div>
 

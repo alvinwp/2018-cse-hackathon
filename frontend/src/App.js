@@ -19,7 +19,7 @@ const styles = {
   },
   body: {
     display: 'flex',
-    marginTop: '70px',
+    marginTop: '80px',
     minWidth: '600px',
     padding: '60 20 0 20',
     width: '85%',
