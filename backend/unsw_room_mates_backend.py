@@ -290,3 +290,5 @@ def getTimeInt(epoch_time):
 
 def convert_from_epoch(epoch_time):
     return getTimeInt(epoch_time), get_day(epoch_time), getWeekInt(epoch_time)
+
+print (get_room_from_day_week("F23", "308", 2, 1))
