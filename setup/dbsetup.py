@@ -35,8 +35,8 @@ def add_to_db(buildingID, buildingName, roomID, roomName,
         week            INTEGER,
         day             INTEGER, 
         FOREIGN KEY(buildingID) REFERENCES buildings(buildingID)
+        UNIQUE (time, day, week)
         );'''.format(buildingID)
-    print(query)
     #create table
     c.execute(query) 
     query = '''INSERT OR IGNORE INTO buildings(buildingID, buildingName)
@@ -44,8 +44,8 @@ def add_to_db(buildingID, buildingName, roomID, roomName,
     values = (buildingID, buildingName)
     c.execute(query, values)
     
-    query = '''INSERT INTO {0}(buildingID, roomID, roomName, roomType, courseID, time, day, week)
-              VALUES(?,?,?,?,?,?,?)'''.format(buildingID)
+    query = '''INSERT OR IGNORE INTO {0}(buildingID, roomID, roomName, roomType, courseID, time, day, week)
+              VALUES(?,?,?,?,?,?,?,?)'''.format(buildingID)
     for week in weeks:
         for time in times:
             values = (buildingID, roomID, roomName, roomType, courseID, time, day, week)
@@ -64,3 +64,24 @@ def add_courses(courseID, courseName):
     c.execute(query, values)
     conn.commit()
     conn.close()
+
+
+db_init()
+
+add_to_db('B16', 'B16', 'LG03', 'LG03', 'Lecture', 'MTRN3020', 
+[22, 23], 2, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+
+add_to_db('B16', 'B16', 'LG03', 'LG03', 'Lecture', 'MTRN3020', 
+[22, 23], 2, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+
+add_to_db('J18', 'J18', '212', '212', 'Laboratory', 'MTRN3020', 
+[24, 25, 26, 27, 28, 29], 5, [5,7,9] );
+
+add_to_db('J18', 'J18', '212', '212', 'Laboratory', 'MTRN3020', 
+[24, 25, 26, 27, 28, 29], 5, [5,7,9] );
+
+add_to_db('J17', 'J17', '203', '203', 'Tutorial-Laboratory', 'MTRN3020', 
+[20, 21], 2, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
+
+add_to_db('J17', 'J17', '203', '203', 'Tutorial-Laboratory', 'MTRN3020', 
+[20, 21], 2, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
