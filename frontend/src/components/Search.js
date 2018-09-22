@@ -180,21 +180,22 @@ class Search extends React.Component {
 
     this.setState({suggestions: suggestions});
   }
-  componentDidUpdate = () => {
-    const { allBuildings } = this.props;
 
-    const suggestions = allBuildings.map(buildingMapping => {
-      return (
-        {
-          label: buildingMapping[1],
-          value: buildingMapping[2]
-        }
-      )}
-    );
-    if (suggestions !== this.state.suggestions){
-      this.setState({suggestions: suggestions});
-    }
-  }
+  // componentDidUpdate = () => {
+  //   const { allBuildings } = this.props;
+
+  //   const suggestions = allBuildings.map(buildingMapping => {
+  //     return (
+  //       {
+  //         label: buildingMapping[1],
+  //         value: buildingMapping[2]
+  //       }
+  //     )}
+  //   );
+  //   if (suggestions !== this.state.suggestions){
+  //     this.setState({suggestions: suggestions});
+  //   }
+  // }
 
   handleChange = name => value => {
     console.log(value);
