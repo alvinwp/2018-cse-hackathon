@@ -110,7 +110,10 @@ def handle_weeks(weeks):
         # singular week        
         else:
             # single week stuff
-            week_list.append(int(str_))
+            try:
+                week_list.append(int(str_))
+            except:
+                continue
     return week_list
 
 def handle_building_names(b):
@@ -120,17 +123,19 @@ def handle_building_names(b):
     # "Mathews 102 (K-F23-102)",
     # "E26 Teaching Lab 11 (K-E26-1101)"
 
-    r = r"(.*?)(\s[0-9]*?\s|\s)\((.*)\)"
+    # r = r"(.*?)(\s[0-9]*?\s|\s)\((.*)\)"
+    r = r"^.*\((.*)\)$"
 
     match = re.search(r, b)
 
     if match:
         building_name = match.group(1).strip()
-        building_id = match.group(3).strip()
+        building_id = match.group(1).strip()
 
         # Strips of room id
-        building_name = building_name.strip(building_id.split("-")[-1]).strip()
+        # building_name = building_name.strip(building_id.split("-")[-1]).strip()
         # print(building_name, ":", building_id)
+        
         name_list = building_id.split('-')
         building_name = name_list[1]
         room_name = name_list[2]
@@ -220,9 +225,12 @@ urls = get_urls()
 size = len(urls)
 
 for i,url in enumerate(urls, 1):
-    page = urlopen(page_url)
+    page = urlopen(url)
     soup = BeautifulSoup(page, "lxml")
     big_list_rooms, title = handle_page(soup)
+    print(i, "out of ", size, url)
     for element in big_list_rooms:
-        add_to_db_helper(element, title.group(0))
-    print(i, "out of ", size)
+        try:
+            add_to_db_helper(element, title.group(0))
+        except:
+            continue
