@@ -10,8 +10,8 @@ import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
 import MenuItem from '@material-ui/core/MenuItem';
 import CancelIcon from '@material-ui/icons/Cancel';
+import axios from 'axios';
 import { emphasize } from '@material-ui/core/styles/colorManipulator';
-
 
 const suggestions = [
   { label: "Ainsworth : J17" },
@@ -153,14 +153,29 @@ const components = {
 };
 
 class Search extends React.Component {
+
   state = {
     buildings: null,
+    suggestions: null,
   };
+  
+  onComponentDidMount = () => {
+    const { allBuildings } = this.props;
+  }
 
   handleChange = name => value => {
     console.log(value);
     
     // TODO: Make POST request to retrieve rooms of selected buildings
+    axios({
+      method: 'post',
+      url: `localhost:5000/rooms`,
+      data: {
+        building_id: value,
+        roomID: value,
+        epoch_time: value
+      }
+    });
 
     this.setState({
       buildings: value,
@@ -168,7 +183,6 @@ class Search extends React.Component {
   };
 
   render() {
-    console.log(this.state.buildings);
     const { classes, theme } = this.props;
 
     const selectStyles = {
@@ -230,7 +244,6 @@ class Search extends React.Component {
               /> 
           </NoSsr>
         </div>
-
         <div className={classes.roomList}>
           <Typography variant='title'>
             Free rooms in Search
