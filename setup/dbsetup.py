@@ -21,19 +21,22 @@ def db_init():
 
 
 def add_to_db(buildingID, buildingName, roomID, roomName, 
-            roomType, times, day, weeks):
+            roomType, courseID, times, day, weeks):
     conn = sqlite3.connect(dbname)
     c = conn.cursor()
     query = '''CREATE TABLE IF NOT EXISTS {0} 
         (
-        FOREIGN KEY(buildingID) REFERENCES buildings(buildingID)
+        buildingID      TEXT NOT NULL,
         roomID          TEXT NOT NULL,
         roomName        TEXT,
         roomType        TEXT,
+        courseID        TEXT,
         time            INTEGER,
         week            INTEGER,
-        day             INTEGER
+        day             INTEGER, 
+        FOREIGN KEY(buildingID) REFERENCES buildings(buildingID)
         );'''.format(buildingID)
+    print(query)
     #create table
     c.execute(query) 
     query = '''INSERT OR IGNORE INTO buildings(buildingID, buildingName)
@@ -41,11 +44,11 @@ def add_to_db(buildingID, buildingName, roomID, roomName,
     values = (buildingID, buildingName)
     c.execute(query, values)
     
-    query = '''INSERT INTO {0}(roomID, roomName, roomType, time, day, week)
-              VALUES(?,?,?,?,?,?)'''.format(buildingID)
+    query = '''INSERT INTO {0}(buildingID, roomID, roomName, roomType, courseID, time, day, week)
+              VALUES(?,?,?,?,?,?,?)'''.format(buildingID)
     for week in weeks:
-        for time in time:
-            values = (roomID, roomName, roomType, time, day, week)
+        for time in times:
+            values = (buildingID, roomID, roomName, roomType, courseID, time, day, week)
             c.execute(query, values)
 
     conn.commit()
