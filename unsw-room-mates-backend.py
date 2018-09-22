@@ -15,7 +15,9 @@ def get_all_building_names():
                          FROM buildings''')
 
     # Return it
-    return [row[0] for row in query]
+    data = [row[0] for row in query]
+    conn.close()
+    return data
     
 
 def get_all_building_ids():
@@ -29,7 +31,9 @@ def get_all_building_ids():
                          FROM buildings''')
 
     # Return it
-    return [row[0] for row in query]
+    data = [row[0] for row in query]
+    conn.close()
+    return data
 
 
 def get_all_buildings_mapping():
@@ -41,14 +45,21 @@ def get_all_buildings_mapping():
     # Get the data
     query = c.execute('''SELECT buildingName, buildingID
                          FROM buildings''')
+    if query == None:
+        conn.close()
+        return None
 
     # Return it
-    return {i: j for (i, j) in query}
+    data = {i: j for (i, j) in query}
+    conn.close()
+    return data
 
+def get_all_building_mappings_parsed():
+    buildings = get_all_buildings_mapping()
+    if buildings == None:
+        return None
 
-def get_building():
-    pass
-
+    return [[i, buildings[i]] for i in buildings]
 
 def get_room_from_day_week(buildingID, roomID, day, week):
 
@@ -65,12 +76,14 @@ def get_room_from_day_week(buildingID, roomID, day, week):
                                   day=? AND
                                   week=?'''.format(buildingID), (roomID,day,week,))
     except sqlite3.OperationalError:
+        conn.close()
         return None
 
     # Get only the time
     result = [dict(row) for row in c.fetchall()]
     times = [row["time"] for row in result]
 
+    conn.close()
     return times
 
 def get_rooms_from_building(buildingID, day, week):
@@ -115,7 +128,7 @@ def get_buildings_free(time_int, day, week):
     sorted_n_free_rooms = []
 
     for k, v in [(k, n_free_rooms[k]) for k in sorted(n_free_rooms, key=n_free_rooms.get, reverse=True)]:
-        sorted_n_free_rooms.append((k, v))
+        sorted_n_free_rooms.append([k, v])
 
     return sorted_n_free_rooms
 
@@ -139,34 +152,65 @@ def get_room_curr_free(buildingID, roomID, time_int, day, week):
         return False
 
 
-def get_all_room_names(building):
+def get_all_room_names(buildingID):
 
     # Connect to database
     conn = sqlite3.connect(DBNAME)
     c = conn.cursor()
     
 
-    # Do a search for building id firstz6
+    # Do a search for building id first
     try:
-        query = c.execute('''SELECT DISTINCT roomName FROM {}'''.format(building))
+        query = c.execute('''SELECT DISTINCT roomName FROM {}'''.format(buildingID))
     except sqlite3.OperationalError:
 
         # Otherwise use its name
         building_mapping = get_all_buildings_mapping()
 
-        if building not in building_mapping:
+        if buildingID not in building_mapping:
+            conn.close()
             return None
         else:            
             try:
-                query = c.execute('''SELECT DISTINCT roomName FROM {}'''.format(building))
+                query = c.execute('''SELECT DISTINCT roomName FROM {}'''.format(buildingID))
             except sqlite3.OperationalError:
+                conn.close()
                 return None
 
-
-    return [room[0] for room in query]
+    data = [room[0] for room in query]
+    conn.close()
+    return data
     
 
-def get_all_room_ids(building):
+def get_all_room_ids(buildingID):
+
+    # Connect to database
+    conn = sqlite3.connect(DBNAME)
+    c = conn.cursor()
+
+    # Do a search for building id first
+    try:
+        query = c.execute('''SELECT DISTINCT roomID FROM {}'''.format(buildingID))
+    except sqlite3.OperationalError:
+
+        # Otherwise use its name
+        building_mapping = get_all_buildings_mapping()
+
+        if buildingID not in building_mapping:
+            conn.close()
+            return None
+        else:            
+            try:
+                query = c.execute('''SELECT DISTINCT roomID FROM {}'''.format(buildingID))
+            except sqlite3.OperationalError:
+                conn.close()
+                return None
+
+    data = [room[0] for room in query]
+    conn.close()
+    return data
+
+def get_all_room_mapping(buildingID):
 
     # Connect to database
     conn = sqlite3.connect(DBNAME)
@@ -174,29 +218,35 @@ def get_all_room_ids(building):
 
     # Do a search for building id firstz6
     try:
-        query = c.execute('''SELECT DISTINCT roomID FROM {}'''.format(building))
+        query = c.execute('''SELECT DISTINCT roomName, roomID FROM {}'''.format(buildingID))
     except sqlite3.OperationalError:
 
         # Otherwise use its name
         building_mapping = get_all_buildings_mapping()
 
-        if building not in building_mapping:
+        if buildingID not in building_mapping:
+            conn.close()
             return None
         else:            
             try:
-                query = c.execute('''SELECT DISTINCT roomID FROM {}'''.format(building))
+                query = c.execute('''SELECT DISTINCT roomName, roomID FROM {}'''.format(buildingID))
             except sqlite3.OperationalError:
+                conn.close()
                 return None
 
-
-    return [room[0] for room in query]
-
+    
+    data = [[room[0], room[1]] for room in query]
+    conn.close()
+    return data
 
 # print (get_all_buildings_mapping())
 # print (get_rooms_from_building("B16", 2, 1))
 print (get_all_room_ids("K17"), len(get_all_room_ids("K17")))
-print (get_rooms_from_building("K17", 4, 4), len(get_rooms_from_building("K17", 3, 1)))
+print (get_rooms_from_building("K17", 5, 6), len(get_rooms_from_building("K17", 3, 1)))
 # print (get_free_rooms_from_building("B16", 22, 2, 1))
 # print (get_buildings_free(20, 2, 1))
 # print (get_room_from_day_week)
 # print (get_all_building_ids())
+# print (get_all_building_mappings_parsed())
+
+# print (get_all_room_mapping("K17"))
