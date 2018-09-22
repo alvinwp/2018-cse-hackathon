@@ -3,11 +3,12 @@ import datetime
 import re
 
 # time given as seconds from epoch
-def get_day(time):
-    time = datetime.datetime.fromtimestamp(time)
-    print(time.weekday()+1)
+def get_day():
+    curr_day = int(time.strftime("%w", time.localtime(time.time())))
+    if curr_day == 0:
+        return 7
+    return curr_day+1
 
-#
 # current time object
 
 # def week_difference(day, month, year):
@@ -45,6 +46,11 @@ def getTimeInt():
 
     return int_time
 
+
+def get_info():
+    return getTimeInt(), get_day(), getWeekInt()
+
+print(get_info())
 # start = 23-Jul-2018
 # mid = 22-Sep-2018
 
