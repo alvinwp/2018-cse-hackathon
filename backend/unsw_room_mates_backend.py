@@ -2,7 +2,7 @@
 import sqlite3
 from time import gmtime, strftime
 
-DBNAME = "db/unsw_roommate"
+DBNAME = "backend/db/unsw_roommate"
 
 def get_all_building_names():
 
@@ -241,8 +241,8 @@ def get_all_room_mapping(buildingID):
 
 # print (get_all_buildings_mapping())
 # print (get_rooms_from_building("B16", 2, 1))
-print (get_all_room_ids("K17"), len(get_all_room_ids("K17")))
-print (get_rooms_from_building("K17", 5, 6), len(get_rooms_from_building("K17", 3, 1)))
+# print (get_all_room_ids("K17"), len(get_all_room_ids("K17")))
+# print (get_rooms_from_building("K17", 5, 6), len(get_rooms_from_building("K17", 3, 1)))
 # print (get_free_rooms_from_building("B16", 22, 2, 1))
 # print (get_buildings_free(20, 2, 1))
 # print (get_room_from_day_week)

@@ -1,15 +1,10 @@
 #!/usr/bin/python3
 from flask import Flask, g, session, request, jsonify, render_template
-from unsw-room-mates-backend import *
+from backend.unsw_room_mates_backend import *
 
 app = Flask(__name__)
 
-@app.route("/")
-def index_route():
-    return render_template("index.html")
-
 # API CALLS
-
 
 # Get a list of all buildings by name
 @app.route("/buildings/name", methods = ["GET"])
@@ -56,14 +51,14 @@ def get_all_room_names_route(buildingID):
 
 # Get a list of all room IDs in a given building
 @app.route("/rooms/<buildingID>/id", methods = ["GET"])
-def get_all_room_ids_route():
+def get_all_room_ids_route(buildingID):
     room_ids = get_all_room_ids(buildingID)
     return {"data": room_ids}
 
 
 # Get a room mapping in a given building
 @app.route("/rooms/<buildingID>/mapping", methods = ["GET"])
-def get_all_room_ids_route():
+def get_all_room_ids_mapping(buildingID):
     room_mapping = get_all_room_mapping(buildingID)
     return {"data": room_mapping}
 
@@ -84,3 +79,6 @@ def get_room_route():
 
     # Return the free_time array
     return get_room_from_day_week(buildingID, roomID, day, week)
+
+if __name__ == "__main__":
+    app.run()
