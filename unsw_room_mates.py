@@ -26,7 +26,7 @@ def get_all_building_mappings_route():
     building_mappings = get_all_building_mappings_parsed()
     return {"data": building_mappings}
 
-# Get a list of buildings be number of rooms free at a given time
+# Get a list of buildings and the rooms free at a given time
 @app.route("/buildings/free", methods = ["POST"])
 def get_buildings_free_route():
 
