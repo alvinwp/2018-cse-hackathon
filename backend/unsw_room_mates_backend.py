@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sqlite3
+import sqlite3, time, datetime, re
 from time import gmtime, strftime
 
 DBNAME = "backend/db/unsw_roommate"
@@ -128,7 +128,7 @@ def get_buildings_free(time_int, day, week):
     sorted_n_free_rooms = []
 
     for k, v in [(k, n_free_rooms[k]) for k in sorted(n_free_rooms, key=n_free_rooms.get, reverse=True)]:
-        sorted_n_free_rooms.append([k, v])
+        sorted_n_free_rooms.append([k, get_free_rooms_from_building(k, time_int, day, week)])
 
     return sorted_n_free_rooms
 
@@ -239,14 +239,54 @@ def get_all_room_mapping(buildingID):
     conn.close()
     return data
 
-# print (get_all_buildings_mapping())
-# print (get_rooms_from_building("B16", 2, 1))
-# print (get_all_room_ids("K17"), len(get_all_room_ids("K17")))
-# print (get_rooms_from_building("K17", 5, 6), len(get_rooms_from_building("K17", 3, 1)))
-# print (get_free_rooms_from_building("B16", 22, 2, 1))
-# print (get_buildings_free(20, 2, 1))
-# print (get_room_from_day_week)
-# print (get_all_building_ids())
-# print (get_all_building_mappings_parsed())
 
-# print (get_all_room_mapping("K17"))
+
+# Epoch conversion
+
+# time given as seconds from epoch
+def get_day(epoch_time):
+    curr_day = int(time.strftime("%w", time.localtime(epoch_time)))
+    if curr_day == 0:
+        return 7
+    return curr_day+1
+
+# current time object
+
+# def week_difference(day, month, year):
+#     now = datetime.date.today() 
+#     dt = datetime.datetime.strptime(str(year)+'-'+str(month)+'-'+str(day), '%Y-%m-%d')
+#     print(now - dt)
+
+def getWeekInt(epoch_time):
+    # current YEAR WEEK is 38
+    # current UNI WEEK is 9
+    # 38-9 = 29
+    WEEK_BUFFER = 29
+    
+    curr_week = int(time.strftime("%W", time.localtime(epoch_time)))
+    
+    # MID SEM WEEK is YEAR WEEK 39
+    # if midsem break return -1
+    if curr_week == 39:
+        return -1
+    # so add 1 week buffer after midsem break
+    elif curr_week >= 40:
+        WEEK_BUFFER = WEEK_BUFFER + 1
+        
+    return curr_week - WEEK_BUFFER        
+
+def getTimeInt(epoch_time):
+    curr_time = time.strftime("%H:%M", time.localtime(epoch_time))
+    
+    s = re.search('([0-9]+):([0-9]+)', curr_time)
+    
+    if int(s.group(2)) <= 30:
+        int_time = int(s.group(1))*2
+    else:
+        int_time = int(s.group(1))*2 + 1
+
+    return int_time
+
+
+def convert_from_epoch(epoch_time):
+    return getTimeInt(epoch_time), get_day(epoch_time), getWeekInt(epoch_time)
