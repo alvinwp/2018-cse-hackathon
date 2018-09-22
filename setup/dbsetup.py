@@ -11,6 +11,7 @@ def db_init():
         buildingName    TEXT NOT NULL
         );''')
     c.execute('''CREATE TABLE IF NOT EXISTS courses
+        (
         courseID      TEXT PRIMARY KEY NOT NULL,
         courseName    TEXT NOT NULL
         );''')
@@ -20,7 +21,7 @@ def db_init():
 
 
 def add_to_db(buildingID, buildingName, roomID, roomName, 
-            roomType, times, days, weeks):
+            roomType, times, day, weeks):
     conn = sqlite3.connect(dbname)
     c = conn.cursor()
     query = '''CREATE TABLE IF NOT EXISTS {0} 
