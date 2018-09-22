@@ -123,17 +123,19 @@ def handle_building_names(b):
     # "Mathews 102 (K-F23-102)",
     # "E26 Teaching Lab 11 (K-E26-1101)"
 
-    r = r"(.*?)(\s[0-9]*?\s|\s)\((.*)\)"
+    # r = r"(.*?)(\s[0-9]*?\s|\s)\((.*)\)"
+    r = r"^.*\((.*)\)$"
 
     match = re.search(r, b)
 
     if match:
         building_name = match.group(1).strip()
-        building_id = match.group(3).strip()
+        building_id = match.group(1).strip()
 
         # Strips of room id
-        building_name = building_name.strip(building_id.split("-")[-1]).strip()
+        # building_name = building_name.strip(building_id.split("-")[-1]).strip()
         # print(building_name, ":", building_id)
+        
         name_list = building_id.split('-')
         building_name = name_list[1]
         room_name = name_list[2]
