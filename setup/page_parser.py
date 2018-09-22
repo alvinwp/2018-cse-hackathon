@@ -110,7 +110,10 @@ def handle_weeks(weeks):
         # singular week        
         else:
             # single week stuff
-            week_list.append(int(str_))
+            try:
+                week_list.append(int(str_))
+            except:
+                continue
     return week_list
 
 def handle_building_names(b):
@@ -220,9 +223,12 @@ urls = get_urls()
 size = len(urls)
 
 for i,url in enumerate(urls, 1):
-    page = urlopen(page_url)
+    page = urlopen(url)
     soup = BeautifulSoup(page, "lxml")
     big_list_rooms, title = handle_page(soup)
+    print(i, "out of ", size, url)
     for element in big_list_rooms:
-        add_to_db_helper(element, title.group(0))
-    print(i, "out of ", size)
+        try:
+            add_to_db_helper(element, title.group(0))
+        except:
+            continue
