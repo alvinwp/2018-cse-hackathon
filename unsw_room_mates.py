@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 from flask import Flask, g, session, request, jsonify, render_template
 from backend.unsw_room_mates_backend import *
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 # API CALLS
 
 # Get a list of all buildings by name
