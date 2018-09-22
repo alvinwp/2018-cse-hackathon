@@ -3,11 +3,12 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import re
 import requests
+import dbsetup
 
 def handle_page(soup):
     title = soup.find_all("td",{"class": "classSearchMinorHeading"})[0].getText()
     title = re.search(r'[A-Z]{4}[0-9]{4}', title)
-    print(title.group(0))
+    # print(title.group(0))
     big_list_rooms = []
 
     for i,elem in enumerate(soup(text=re.compile(r'Class Nbr'))):
@@ -41,8 +42,9 @@ def handle_page(soup):
                 room_list.append(new_dict)
         info_dict['rooms'] = room_list
         big_list_rooms.append(info_dict)
-    return big_list_rooms, title
     # print(big_list_rooms)
+    return big_list_rooms, title
+    
 
 # Parameters to DB
 # --------------
@@ -59,25 +61,37 @@ def handle_page(soup):
 # Time          - Integer (0 - 2359) (
 
 def add_to_db_helper(table, coursename):
+
+    dayMap = {}
+    day_list = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    for i,day in enumerate(day_list, 1):
+        dayMap[day] = i
+
     # Check for rooms in the table
+    activity_type = str(table.get('Activity'))
     for room_dict in table['rooms']:
         time = room_dict.get('Time')
 
         # Get room details
         location = room_dict.get('Location')
         day = room_dict.get('Day')
-        
+        day = dayMap[day]
+
         building_name, room_name = handle_building_names(room_dict.get("Location"))
         building_id = building_name
         room_id = room_name
-    
-        # Course name
 
         # Split by commas
         # Handle data from the weeks
         week = room_dict.get('Weeks')
         week_list = handle_weeks(week)
+        time = timeToArray(room_dict.get('Time'))
 
+        # def add_to_db(buildingID, buildingName, roomID, roomName, 
+        #     roomType, courseID, times, day, weeks):
+        # print("buildingID/Name", building_name, "room_id/name", room_id, "Weeks", week_list, "Day", day, "Room_type", activity_type, "time", time)
+        dbsetup.add_to_db(building_id, building_name, room_id, room_id, activity_type, coursename, time, day, week_list)
+        # add_to_db('J17', 'J17', '203', '203', 'Tutorial-Laboratory', 'MTRN3020', [20, 21], 2, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
 
 def handle_weeks(weeks):
     str_list = weeks.split(',')
@@ -90,14 +104,14 @@ def handle_weeks(weeks):
                 ranges = match.split('-')
                 lower = int(ranges[0])
                 upper = int(ranges[1])
-                print("lower" + ranges[0])
-                print("upper" + ranges[1])
+                # print("lower" + ranges[0])
+                # print("upper" + ranges[1])
                 week_list.extend(range(lower, upper+1))
         # singular week        
         else:
             # single week stuff
             week_list.append(int(str_))
-    return week_list, title
+    return week_list
 
 def handle_building_names(b):
 
@@ -116,7 +130,7 @@ def handle_building_names(b):
 
         # Strips of room id
         building_name = building_name.strip(building_id.split("-")[-1]).strip()
-        print(building_name, ":", building_id)
+        # print(building_name, ":", building_id)
         name_list = building_id.split('-')
         building_name = name_list[1]
         room_name = name_list[2]
@@ -146,12 +160,12 @@ def add_details(tr_list, index_list, info_dict):
         for j, label in enumerate(td_list_labels, 0):
             info_dict[label.getText()] = td_list_data[j].getText()
 
-
+# Get all URLs to parse
 def get_urls():
     url = "http://timetable.unsw.edu.au/2018"
     # Get List of Faculty
     source = requests.get(url + "/KENSUGRDT2.html").content
-    soup = BeautifulSoup(source)
+    soup = BeautifulSoup(source, "lxml")
 
     fac_tr_list = soup.findAll('tr', {'class':['rowLowlight', 'rowHighlight']})
     fac_href = []
@@ -164,22 +178,51 @@ def get_urls():
 
     for i in fac_href:
         source2 = requests.get(i).content
-        soup2 = BeautifulSoup(source2)
+        soup2 = BeautifulSoup(source2, "lxml")
 
         course_tr_list = soup2.findAll('tr', {'class' : ['rowLowlight', 'rowHighlight']})
         for i in course_tr_list:
-            course_href.append(url + '/' + i.find('a')['
-            
+            course_href.append(url + '/' + i.find('a')['href'])
     return course_href
- 
+
+# Given a string, convert to a time array
+def timeToArray(time_str):
+    s = re.match('([0-9]+):([0-9]+) - ([0-9]+):([0-9]+)', time_str)
+    # regex
+    start = int(s.group(1))
+    start_half = int(s.group(2))
+    end = int(s.group(3))
+    end_half = int(s.group(4))
+    
+    # add half blocks
+    if start_half == 30:
+        start = start + 0.5  
+    if end_half == 30:
+        end = end + 0.5
+        
+    result = end - start
+    
+    # create list
+    time_array = []
+    for i in range(int(result*2)):
+        time_array.append(int(start*2 + i))
+    
+    return time_array
+
 # Try beautiful soup
 
 # page_url = 'http://timetable.unsw.edu.au/2018/ACCT1511.html'
+
+dbsetup.db_init()
 page_url = 'http://timetable.unsw.edu.au/2018/ELEC1111.html#S1-5346'
-page = urlopen(page_url)
-soup = BeautifulSoup(page, "lxml")
-big_list_rooms, title = handle_page(soup)
+urls = get_urls()
+# urls = ['http://timetable.unsw.edu.au/2018/ELEC1111.html#S1-5346']
+size = len(urls)
 
-for element in big_list_rooms:
-    add_to_db_helper(element, title)
-
+for i,url in enumerate(urls, 1):
+    page = urlopen(page_url)
+    soup = BeautifulSoup(page, "lxml")
+    big_list_rooms, title = handle_page(soup)
+    for element in big_list_rooms:
+        add_to_db_helper(element, title.group(0))
+    print(i, "out of ", size)

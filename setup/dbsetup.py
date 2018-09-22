@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sqlite3
-dbname = "test"
+dbname = "unsw_roommate"
 
 def db_init():
     conn = sqlite3.connect(dbname)
@@ -53,7 +53,7 @@ def add_to_db(buildingID, buildingName, roomID, roomName,
 
     conn.commit()
     conn.close()
-    print("Adding completed successfully")
+    # print("Adding completed successfully")
 
 def add_courses(courseID, courseName):
     conn = sqlite3.connect(dbname)
