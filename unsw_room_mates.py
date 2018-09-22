@@ -32,7 +32,7 @@ def get_buildings_free_route():
     data = request.form
 
     # Get the time data
-    time_int, day, week = convert_from_epoch(data["epoch_time"])
+    time_int, day, week = convert_from_epoch(int(data["epoch_time"]))
 
     # Get buildings sorted by number of free rooms
     free_buildings = get_buildings_free(time_int, day, week)
@@ -70,7 +70,7 @@ def get_room_route():
     roomID     = data["roomID"]
 
     # Get the time data
-    _, day, week = convert_from_epoch(data["epoch_time"])
+    _, day, week = convert_from_epoch(int(data["epoch_time"]))
 
     # Return the free_time array
     return jsonify(get_room_from_day_week(buildingID, roomID, day, week))

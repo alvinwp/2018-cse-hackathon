@@ -181,21 +181,26 @@ class Search extends React.Component {
     this.setState({suggestions: suggestions});
   }
 
-  // componentDidUpdate = () => {
-  //   const { allBuildings } = this.props;
+  componentDidUpdate = () => {
+    const { allBuildings } = this.props;
 
-  //   const suggestions = allBuildings.map(buildingMapping => {
-  //     return (
-  //       {
-  //         label: buildingMapping[1],
-  //         value: buildingMapping[2]
-  //       }
-  //     )}
-  //   );
-  //   if (suggestions !== this.state.suggestions){
-  //     this.setState({suggestions: suggestions});
-  //   }
-  // }
+    console.log(allBuildings);
+    // if (suggestions !== allBuildings){
+    //   this.setState({suggestions: suggestions});
+    // }
+
+    // const suggestions = allBuildings.map(buildingMapping => {
+    //   return (
+    //     {
+    //       label: buildingMapping[1],
+    //       value: buildingMapping[2]
+    //     }
+    //   )}
+    // );
+    // console.log(suggestions);
+    // if (suggestions !== this.state.suggestions){
+    // }
+  }
 
   handleChange = name => value => {
     console.log(value);
@@ -222,7 +227,7 @@ class Search extends React.Component {
 
   render() {
     const { classes, theme } = this.props;
-    const { suggestions } = this.state;
+    // const { suggestions } = this.state;
     
     const selectStyles = {
       input: base => ({

@@ -41,7 +41,7 @@ class App extends Component {
 
     axios({
       method: 'get',
-      url: `http://localhost:5000/buildings/mapping`,
+      url: `http://localhost:5000/buildings/name`,
     }).then(response => {
       console.log(response.data);
       this.setState({ allBuildings: response.data });
