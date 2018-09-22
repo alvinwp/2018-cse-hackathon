@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import re
+import requests
 
 def handle_page(soup):
     title = soup.find_all("td",{"class": "classSearchMinorHeading"})[0].getText()
@@ -145,14 +146,32 @@ def add_details(tr_list, index_list, info_dict):
         for j, label in enumerate(td_list_labels, 0):
             info_dict[label.getText()] = td_list_data[j].getText()
 
-#'course title': 'ELEC1111 Electrical and Telecommunications Engineering', 
-# 'Offering Period': '23/07/2018 - 28/10/2018', 'Class Nbr': '5572', 
-# 'Section': 'H11A', 'Status': 'Open', 'Meeting Dates': 'Standard dates', 
-# 'Teaching Period': 'T2 - Teaching Period Two', 'Consent': 'Consent not required', 
-# 'Instruction Mode': 'In Person', 'Activity': 'Tutorial', 'Census Date': '31/08/2018',
-#  'Enrols/Capacity': '95/120'}
 
+def get_urls():
+    url = "http://timetable.unsw.edu.au/2018"
+    # Get List of Faculty
+    source = requests.get(url + "/KENSUGRDT2.html").content
+    soup = BeautifulSoup(source)
 
+    fac_tr_list = soup.findAll('tr', {'class':['rowLowlight', 'rowHighlight']})
+    fac_href = []
+
+    for i in fac_tr_list:
+        fac_href.append(url + '/' + i.find('a')['href'])
+
+    # Get List of Courses in Faculty
+    course_href = []
+
+    for i in fac_href:
+        source2 = requests.get(i).content
+        soup2 = BeautifulSoup(source2)
+
+        course_tr_list = soup2.findAll('tr', {'class' : ['rowLowlight', 'rowHighlight']})
+        for i in course_tr_list:
+            course_href.append(url + '/' + i.find('a')['
+            
+    return course_href
+ 
 # Try beautiful soup
 
 # page_url = 'http://timetable.unsw.edu.au/2018/ACCT1511.html'
@@ -163,3 +182,4 @@ big_list_rooms, title = handle_page(soup)
 
 for element in big_list_rooms:
     add_to_db_helper(element, title)
+
