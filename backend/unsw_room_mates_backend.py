@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sqlite3
+import sqlite3, time, datetime, re
 from time import gmtime, strftime
 
 DBNAME = "backend/db/unsw_roommate"
@@ -242,9 +242,6 @@ def get_all_room_mapping(buildingID):
 
 
 # Epoch conversion
-import time
-import datetime
-import re
 
 # time given as seconds from epoch
 def get_day(epoch_time):

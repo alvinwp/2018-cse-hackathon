@@ -9,22 +9,19 @@ app = Flask(__name__)
 # Get a list of all buildings by name
 @app.route("/buildings/name", methods = ["GET"])
 def get_all_building_names_route():
-    building_names = get_all_building_names()
-    return jsonify({"data": building_names})
+    return jsonify(get_all_building_names())
 
 
 # Get a list of all buildings by ID
 @app.route("/buildings/id", methods = ["GET"])
 def get_all_building_ids_route():
-    building_ids = get_all_building_ids()
-    return jsonify({"data": building_ids})
+    return jsonify(get_all_building_ids())
 
 
 # Get a buildings mapping (list of tuples/list)
 @app.route("/buildings/mapping", methods = ["GET"])
 def get_all_building_mappings_route():
-    building_mappings = get_all_building_mappings_parsed()
-    return jsonify({"data": building_mappings})
+    return jsonify(get_all_building_mappings_parsed())
 
 # Get a list of buildings and the rooms free at a given time
 @app.route("/buildings/free", methods = ["POST"])
@@ -45,22 +42,19 @@ def get_buildings_free_route():
 # Get a list of all room names in a given building
 @app.route("/rooms/<buildingID>/name", methods = ["GET"])
 def get_all_room_names_route(buildingID):
-    room_names = get_all_room_names(buildingID)
-    return jsonify({"data": room_names})
+    return jsonify(get_all_room_names(buildingID))
 
 
 # Get a list of all room IDs in a given building
 @app.route("/rooms/<buildingID>/id", methods = ["GET"])
 def get_all_room_ids_route(buildingID):
-    room_ids = get_all_room_ids(buildingID)
-    return jsonify({"data": room_ids})
+    return jsonify(get_all_room_ids(buildingID))
 
 
 # Get a room mapping in a given building
 @app.route("/rooms/<buildingID>/mapping", methods = ["GET"])
 def get_all_room_ids_mapping(buildingID):
-    room_mapping = get_all_room_mapping(buildingID)
-    return jsonify({"data": room_mapping})
+    return jsonify(get_all_room_mapping(buildingID))
 
 
 
