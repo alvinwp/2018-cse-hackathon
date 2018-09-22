@@ -30,20 +30,22 @@ class App extends Component {
   state = {
     allBuildings : [],
   }
-  onComponentDidMount() {
+  componentDidMount() {
     // axios({
     //   method: 'get',
     //   url: `localhost:8000/rooms`,
     // }).then(response => {
     //   this.setState({rooms: response});
     // })
+    console.log('mount');
 
     axios({
       method: 'get',
-      url: `localhost:5000/buildings/mapping`,
+      url: `http://localhost:5000/buildings/mapping`,
     }).then(response => {
-      this.setState({allBuildings: response});
-    })
+      console.log(response.data);
+      this.setState({ allBuildings: response.data });
+    });
   }
 
 

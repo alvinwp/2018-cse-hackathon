@@ -159,19 +159,56 @@ class Search extends React.Component {
     suggestions: null,
   };
   
-  onComponentDidMount = () => {
+  componentDidMount = () => {
     const { allBuildings } = this.props;
+    console.log(allBuildings);
+    const suggestions = allBuildings.map(buildingMapping => {
+      // return (
+      //   {
+      //     label: `${buildingMapping(1)} : ${buildingMapping(2)}`, 
+      //     value: buildingMapping(1)
+      //   }
+      // );
+      console.log(buildingMapping);
+      return (
+        {
+          label: buildingMapping[1],
+          value: buildingMapping[2]
+        }
+      );
+    });
+
+    this.setState({suggestions: suggestions});
+  }
+  componentDidUpdate = () => {
+    const { allBuildings } = this.props;
+
+    const suggestions = allBuildings.map(buildingMapping => {
+      return (
+        {
+          label: buildingMapping[1],
+          value: buildingMapping[2]
+        }
+      )}
+    );
+    if (suggestions !== this.state.suggestions){
+      this.setState({suggestions: suggestions});
+    }
   }
 
   handleChange = name => value => {
     console.log(value);
-    
+    const searchBuilding = this.state.buildings && this.state.buildings[0];
+    if (!searchBuilding) {
+      return;
+    }
+
     // TODO: Make POST request to retrieve rooms of selected buildings
     axios({
       method: 'post',
-      url: `localhost:5000/rooms`,
+      url: `http://localhost:5000/rooms`,
       data: {
-        building_id: value,
+        building_id: searchBuilding,
         roomID: value,
         epoch_time: value
       }
@@ -184,7 +221,8 @@ class Search extends React.Component {
 
   render() {
     const { classes, theme } = this.props;
-
+    const { suggestions } = this.state;
+    
     const selectStyles = {
       input: base => ({
         ...base,
