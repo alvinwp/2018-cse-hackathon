@@ -6,7 +6,7 @@ timee = time.time()
 print(timee)
 
 
-# time given as epoch
+# time given as seconds from epoch
 def get_day(time):
     time = datetime.datetime.fromtimestamp(time)
     print(time.weekday()+1)
@@ -19,6 +19,18 @@ print(epoch)
 get_day(epoch)
 
 
+#
+# current time object
+
+def week_difference(time, date_string):
+    d1 = datetime.datetime.fromtimestamp(time)
+
+    date_time = '30.08.2011 11:05:02'
+    pattern = '%d.%m.%Y %H:%M:%S'
+    epoch = int(time.mktime(time.strptime(date_time, pattern)))
+
+    d2 = datetime.datetime.fromtimestamp(epoch)
+    result = (d1-d2).days//7
 
 
 # start = 23-Jul-2018
