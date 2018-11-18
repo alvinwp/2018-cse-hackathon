@@ -13,7 +13,7 @@ import requests
 #testing info 2018 s2ARCH has half hour classes
 #2018 s2 EDST has weird courses and also has one with 3 days
 #2018 s2 
-termStr = "Sem 2" 
+termStr = "Term 1" 
 
 dayMap = {'Mon': 0, 'Tue': 1, 'Wed': 2, 'Thu': 3, 'Fri': 4, 'Sat': 6, 'Sun': 7}
 
@@ -29,7 +29,8 @@ def logLine(line):
 
 def getUrlList():
     # Get all URLs to parse
-    rootUrl = "https://nss.cse.unsw.edu.au/sitar/classes2018/"
+    # rootUrl = "https://nss.cse.unsw.edu.au/sitar/classes2018/" #for archived courses
+    rootUrl = "http://classutil.unsw.edu.au/" #current
     indexUrl = rootUrl + 'index.html'
     htmlSrc = requests.get(indexUrl).content
     soup = BeautifulSoup(htmlSrc, "lxml")
@@ -42,7 +43,7 @@ def getUrlList():
         for term in terms:
             
             if term.string == termStr:
-                urls.append(rootUrl + '/' + term.find('a')['href'])
+                urls.append(rootUrl + term.find('a')['href'])
     return urls
 
 def extractCourseName(row):
@@ -216,14 +217,17 @@ def hasLocation(row, cols):
     if classInfo['status'].startswith('Canc'):
         logReason = 'status: Canc'
         return False
+    if 'CRS' in classInfo['comp']:
+        logReason = 'comp: course enrollment (not a class)'
+        return False
     if 'WEB' in classInfo['sect']:
         logReason = 'sect: WEB course'
         return False
     if 'N/A' in classInfo['perc']:
         logReason = 'perc: N/A percentage'
         return False
-    if 'even' in cols[7].contents[0]: #special case even weeks specified
-        logReason = '\n==========!!!\n' + 'Special case, may require manual entry'
+    if 'even' in cols[7].contents[0] or 'odd' in cols[7].contents[0]: #special case even weeks specified
+        logReason = '\n==========!!!\n' + 'Special case, may require manual entry' + "odd or even in contents"
         return False
     return True
 
