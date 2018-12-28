@@ -4,6 +4,7 @@
 from bs4 import BeautifulSoup
 import re
 import requests
+import dbsetup
 
 # term format: Term [Term no.]
 # prior to 2018 format: Sem [Sem no.]
@@ -70,6 +71,13 @@ def isValidWeek(string):
         return False
     return True
 
+def locationToRoomAndBuilding(location):
+    match = re.search(r'([A-Za-z0-9& ]+?([^ ][A-Z]{2})?) ?([A-Z]*?[0-9]*)$', location)
+    building = match.group(1)
+    room = match.group(3)
+    print("LOCATION", (building, room))
+    return (building, room)
+
 def extractBrackets(string):
     global logReason
     brackets = {}
@@ -114,6 +122,7 @@ def extractBrackets(string):
                 for i in range(int(startWeek), int(endWeek)):
                     brackets['weeks'].append(i)
             #print('WEEKS', startWeek, endWeek)
+        locationToRoomAndBuilding(brackets['location']);
     return brackets
 
 def daysToArr(string):
@@ -194,6 +203,12 @@ def parseTimes(string):
         print(days, daysToArr(days))
         (startTime, endTime) = cleanTime(startTime, endTime)
         print(startTime, endTime, timeToArray(startTime, endTime))
+        for day in days:
+            buildingId = re.sub(r'^[\d ]+', '', locationToRoomAndBuilding(brackets['location'])[0])
+            buildingId = re.sub(r'[^A-Za-z0-9]', '', buildingId)
+            dbsetup.add_to_db(buildingId, locationToRoomAndBuilding(brackets['location'])[0], 
+            locationToRoomAndBuilding(brackets['location'])[1], locationToRoomAndBuilding(brackets['location'])[1],
+            '', courseInfo['id'], timeToArray(startTime, endTime), day, brackets['weeks'])
         #if(len(daysToArr(days)) > 1):
             #print(string, daysToArr(days))
     return None
@@ -259,14 +274,13 @@ def parseTable(table):
     rows = table.findAll('tr')
     for row in rows:
         if 'class' in row.attrs and ('rowLowlight' in row['class'] or 'rowHighlight' in row['class']):
-            
             extractClassInfo(row)
         else:
             extractCourseName(row)
         if(logReason != ''):
             logLine(logReason + "\t" + str(courseInfo) + "\t" + str(classInfo) + "\t" + str(row.contents))
             logReason = ''
-
+    
 urls = getUrlList()
 
 #urls = ['https://nss.cse.unsw.edu.au/sitar/classes2018/COMP_S2.html']
